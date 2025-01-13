@@ -6908,7 +6908,76 @@ enableDismissTrigger(Toast);
  */
 
 defineJQueryPlugin(Toast);
-},{"@popperjs/core":"node_modules/@popperjs/core/lib/index.js"}],"node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
+},{"@popperjs/core":"node_modules/@popperjs/core/lib/index.js"}],"Carousel.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.appendCarousel = appendCarousel;
+exports.clear = clear;
+exports.createCarouselItem = createCarouselItem;
+exports.start = start;
+var bootstrap = _interopRequireWildcard(require("bootstrap"));
+var _axios = require("./axios.js");
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
+function createCarouselItem(imgSrc, imgAlt, imgId) {
+  var template = document.querySelector("#carouselItemTemplate");
+  var clone = template.content.firstElementChild.cloneNode(true);
+  var img = clone.querySelector("img");
+  img.src = imgSrc;
+  img.alt = imgAlt;
+  var favBtn = clone.querySelector(".favourite-button");
+  favBtn.addEventListener("click", function () {
+    (0, _axios.favourite)(imgId);
+  });
+  return clone;
+}
+function clear() {
+  var carousel = document.querySelector("#carouselInner");
+  while (carousel.firstChild) {
+    carousel.removeChild(carousel.firstChild);
+  }
+}
+function appendCarousel(element) {
+  var carousel = document.querySelector("#carouselInner");
+  var activeItem = document.querySelector(".carousel-item.active");
+  if (!activeItem) element.classList.add("active");
+  carousel.appendChild(element);
+}
+function start() {
+  var multipleCardCarousel = document.querySelector("#carouselExampleControls");
+  if (window.matchMedia("(min-width: 768px)").matches) {
+    var carousel = new bootstrap.Carousel(multipleCardCarousel, {
+      interval: false
+    });
+    var carouselWidth = $(".carousel-inner")[0].scrollWidth;
+    var cardWidth = $(".carousel-item").width();
+    var scrollPosition = 0;
+    $("#carouselExampleControls .carousel-control-next").unbind();
+    $("#carouselExampleControls .carousel-control-next").on("click", function () {
+      if (scrollPosition < carouselWidth - cardWidth * 4) {
+        scrollPosition += cardWidth;
+        $("#carouselExampleControls .carousel-inner").animate({
+          scrollLeft: scrollPosition
+        }, 600);
+      }
+    });
+    $("#carouselExampleControls .carousel-control-prev").unbind();
+    $("#carouselExampleControls .carousel-control-prev").on("click", function () {
+      if (scrollPosition > 0) {
+        scrollPosition -= cardWidth;
+        $("#carouselExampleControls .carousel-inner").animate({
+          scrollLeft: scrollPosition
+        }, 600);
+      }
+    });
+  } else {
+    $(multipleCardCarousel).addClass("slide");
+  }
+}
+},{"bootstrap":"node_modules/bootstrap/dist/js/bootstrap.esm.js","./axios.js":"axios.js"}],"node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -12171,298 +12240,7 @@ exports.isCancel = isCancel;
 exports.CanceledError = CanceledError;
 exports.AxiosError = AxiosError;
 exports.Axios = Axios;
-},{"./lib/axios.js":"node_modules/axios/lib/axios.js"}],"index.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.favourite = favourite;
-var Carousel = _interopRequireWildcard(require("./Carousel.js"));
-var _axios = _interopRequireDefault(require("axios"));
-function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
-function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
-function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator.return && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, catch: function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
-function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
-function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
-// The breed selection input element.
-var breedSelect = document.getElementById("breedSelect");
-// The information section div element.
-var infoDump = document.getElementById("infoDump");
-// The progress bar div element.
-var progressBar = document.getElementById("progressBar");
-// The get favourites button element.
-var getFavouritesBtn = document.getElementById("getFavouritesBtn");
-
-// Step 0: Store your API key here for reference and easy access.
-var API_KEY = "live_JRSGN9YvGuyHRgxfsHMQcnwZaewFzlrcB5PvuWf02JylZ16l5EuRiNuwZgR4rslW";
-
-/**
- * 1. Create an async function "initialLoad" that does the following:
- * - Retrieve a list of breeds from the cat API using fetch().
- * - Create new <options> for each of these breeds, and append them to breedSelect.
- *  - Each option should have a value attribute equal to the id of the breed.
- *  - Each option should display text equal to the name of the breed.
- * This function should execute immediately.
- */
-function initialLoad() {
-  return _initialLoad.apply(this, arguments);
-}
-function _initialLoad() {
-  _initialLoad = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-    var breedList, breedData;
-    return _regeneratorRuntime().wrap(function _callee$(_context) {
-      while (1) switch (_context.prev = _context.next) {
-        case 0:
-          _context.next = 2;
-          return fetch("https://api.thecatapi.com/v1/breeds");
-        case 2:
-          breedList = _context.sent;
-          _context.next = 5;
-          return breedList.json();
-        case 5:
-          breedData = _context.sent;
-          // console.log(breedData);
-          breedData.forEach(function (breed) {
-            // breed select
-            var option = document.createElement("option");
-            option.textContent = breed.name;
-            option.value = breed.id;
-            breedSelect.append(option);
-          });
-        case 7:
-        case "end":
-          return _context.stop();
-      }
-    }, _callee);
-  }));
-  return _initialLoad.apply(this, arguments);
-}
-initialLoad();
-
-/**
- * 2. Create an event handler for breedSelect that does the following:
- * - Retrieve information on the selected breed from the cat API using fetch().
- *  - Make sure your request is receiving multiple array items!
- *  - Check the API documentation if you're only getting a single object.
- * - For each object in the response array, create a new element for the carousel.
- *  - Append each of these new elements to the carousel.
- * - Use the other data you have been given to create an informational section within the infoDump element.
- *  - Be creative with how you create DOM elements and HTML.
- *  - Feel free to edit index.html and styles.css to suit your needs, but be careful!
- *  - Remember that functionality comes first, but user experience and design are important.
- * - Each new selection should clear, re-populate, and restart the Carousel.
- * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
- */
-
-breedSelect.addEventListener("change", getBreedData);
-function getBreedData(_x) {
-  return _getBreedData.apply(this, arguments);
-}
-/**
- * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
- */
-/**
- * 4. Change all of your fetch() functions to axios!
- * - axios has already been imported for you within index.js.
- * - If you've done everything correctly up to this point, this should be simple.
- * - If it is not simple, take a moment to re-evaluate your original code.
- * - Hint: Axios has the ability to set default headers. Use this to your advantage
- *   by setting a default header with your API key so that you do not have to
- *   send it manually with all of your requests! You can also set a default base URL!
- */
-/**
- * 5. Add axios interceptors to log the time between request and response to the console.
- * - Hint: you already have access to code that does this!
- * - Add a console.log statement to indicate when requests begin.
- * - As an added challenge, try to do this on your own without referencing the lesson material.
- */
-/**
- * 6. Next, we'll create a progress bar to indicate the request is in progress.
- * - The progressBar element has already been created for you.
- *  - You need only to modify its "width" style property to align with the request progress.
- * - In your request interceptor, set the width of the progressBar element to 0%.
- *  - This is to reset the progress with each request.
- * - Research the axios onDownloadProgress config option.
- * - Create a function "updateProgress" that receives a ProgressEvent object.
- *  - Pass this function to the axios onDownloadProgress config option in your event handler.
- * - console.log your ProgressEvent object within updateProgess, and familiarize yourself with its structure.
- *  - Update the progress of the request using the properties you are given.
- * - Note that we are not downloading a lot of data, so onDownloadProgress will likely only fire
- *   once or twice per request to this API. This is still a concept worth familiarizing yourself
- *   with for future projects.
- */
-/**
- * 7. As a final element of progress indication, add the following to your axios interceptors:
- * - In your request interceptor, set the body element's cursor style to "progress."
- * - In your response interceptor, remove the progress cursor style from the body element.
- */
-/**
- * 8. To practice posting data, we'll create a system to "favourite" certain images.
- * - The skeleton of this function has already been created for you.
- * - This function is used within Carousel.js to add the event listener as items are created.
- *  - This is why we use the export keyword for this function.
- * - Post to the cat API's favourites endpoint with the given ID.
- * - The API documentation gives examples of this functionality using fetch(); use Axios!
- * - Add additional logic to this function such that if the image is already favourited,
- *   you delete that favourite using the API, giving this function "toggle" functionality.
- * - You can call this function by clicking on the heart at the top right of any image.
- */
-function _getBreedData() {
-  _getBreedData = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2(e) {
-    var breed_id, response, data, breedObj, h1, h2, h3;
-    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-      while (1) switch (_context2.prev = _context2.next) {
-        case 0:
-          Carousel.clear();
-          infoDump.textContent = "";
-          // console.log(breedSelect.value);
-          breed_id = breedSelect.value; // console.log(e.target);
-          _context2.next = 5;
-          return fetch("https://api.thecatapi.com/v1/images/search?limit=10&breed_ids=".concat(breed_id, "&api_key=").concat(API_KEY), {
-            method: "GET",
-            withCredentials: true,
-            headers: {
-              "X-Auth-Token": API_KEY,
-              "Content-Type": "application/json"
-            }
-          });
-        case 5:
-          response = _context2.sent;
-          _context2.next = 8;
-          return response.json();
-        case 8:
-          data = _context2.sent;
-          // console.log(data, "====2nd===");
-          data.forEach(function (d) {
-            var x = Carousel.createCarouselItem(d.url, breed_id, d.id);
-            Carousel.appendCarousel(x);
-          });
-          Carousel.start();
-          // console.log(data[0].breeds[0]);
-          breedObj = data[0].breeds[0];
-          h1 = document.createElement('h1');
-          h2 = document.createElement('h2');
-          h3 = document.createElement('h3');
-          h1.textContent = breedObj.name;
-          h2.textContent = breedObj.origin;
-          h3.textContent = breedObj.description;
-          console.log(breedObj);
-          // description and origin
-          infoDump.appendChild(h1);
-          infoDump.appendChild(h2);
-          infoDump.appendChild(h3);
-        case 22:
-        case "end":
-          return _context2.stop();
-      }
-    }, _callee2);
-  }));
-  return _getBreedData.apply(this, arguments);
-}
-function favourite(_x2) {
-  return _favourite.apply(this, arguments);
-}
-/**
- * 9. Test your favourite() function by creating a getFavourites() function.
- * - Use Axios to get all of your favourites from the cat API.
- * - Clear the carousel and display your favourites when the button is clicked.
- *  - You will have to bind this event listener to getFavouritesBtn yourself.
- *  - Hint: you already have all of the logic built for building a carousel.
- *    If that isn't in its own function, maybe it should be so you don't have to
- *    repeat yourself in this section.
- */
-/**
- * 10. Test your site, thoroughly!
- * - What happens when you try to load the Malayan breed?
- *  - If this is working, good job! If not, look for the reason why and fix it!
- * - Test other breeds as well. Not every breed has the same data available, so
- *   your code should account for this.
- */
-function _favourite() {
-  _favourite = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3(imgId) {
-    return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-      while (1) switch (_context3.prev = _context3.next) {
-        case 0:
-        case "end":
-          return _context3.stop();
-      }
-    }, _callee3);
-  }));
-  return _favourite.apply(this, arguments);
-}
-},{"./Carousel.js":"Carousel.js","axios":"node_modules/axios/index.js"}],"Carousel.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.appendCarousel = appendCarousel;
-exports.clear = clear;
-exports.createCarouselItem = createCarouselItem;
-exports.start = start;
-var bootstrap = _interopRequireWildcard(require("bootstrap"));
-var _index = require("./index.js");
-function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
-function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
-function createCarouselItem(imgSrc, imgAlt, imgId) {
-  var template = document.querySelector("#carouselItemTemplate");
-  var clone = template.content.firstElementChild.cloneNode(true);
-  var img = clone.querySelector("img");
-  img.src = imgSrc;
-  img.alt = imgAlt;
-  var favBtn = clone.querySelector(".favourite-button");
-  favBtn.addEventListener("click", function () {
-    (0, _index.favourite)(imgId);
-  });
-  return clone;
-}
-function clear() {
-  var carousel = document.querySelector("#carouselInner");
-  while (carousel.firstChild) {
-    carousel.removeChild(carousel.firstChild);
-  }
-}
-function appendCarousel(element) {
-  var carousel = document.querySelector("#carouselInner");
-  var activeItem = document.querySelector(".carousel-item.active");
-  if (!activeItem) element.classList.add("active");
-  carousel.appendChild(element);
-}
-function start() {
-  var multipleCardCarousel = document.querySelector("#carouselExampleControls");
-  if (window.matchMedia("(min-width: 768px)").matches) {
-    var carousel = new bootstrap.Carousel(multipleCardCarousel, {
-      interval: false
-    });
-    var carouselWidth = $(".carousel-inner")[0].scrollWidth;
-    var cardWidth = $(".carousel-item").width();
-    var scrollPosition = 0;
-    $("#carouselExampleControls .carousel-control-next").unbind();
-    $("#carouselExampleControls .carousel-control-next").on("click", function () {
-      if (scrollPosition < carouselWidth - cardWidth * 4) {
-        scrollPosition += cardWidth;
-        $("#carouselExampleControls .carousel-inner").animate({
-          scrollLeft: scrollPosition
-        }, 600);
-      }
-    });
-    $("#carouselExampleControls .carousel-control-prev").unbind();
-    $("#carouselExampleControls .carousel-control-prev").on("click", function () {
-      if (scrollPosition > 0) {
-        scrollPosition -= cardWidth;
-        $("#carouselExampleControls .carousel-inner").animate({
-          scrollLeft: scrollPosition
-        }, 600);
-      }
-    });
-  } else {
-    $(multipleCardCarousel).addClass("slide");
-  }
-}
-},{"bootstrap":"node_modules/bootstrap/dist/js/bootstrap.esm.js","./index.js":"index.js"}],"axios.js":[function(require,module,exports) {
+},{"./lib/axios.js":"node_modules/axios/lib/axios.js"}],"axios.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -12513,7 +12291,7 @@ var API_KEY = "live_JRSGN9YvGuyHRgxfsHMQcnwZaewFzlrcB5PvuWf02JylZ16l5EuRiNuwZgR4
 // );
 
 // add a request interceptor to log when requests begin, reset the progress bar
-api.interceptors.request.use(function (config) {
+_axios.default.interceptors.request.use(function (config) {
   // reset progress bar to 0% when a new request starts
   progressBar.style.width = "0%";
   document.body.style.cursor = "progress";
@@ -12526,7 +12304,7 @@ api.interceptors.request.use(function (config) {
 });
 
 // add a response interceptor to log the time taken for the request
-api.interceptors.response.use(function (response) {
+_axios.default.interceptors.response.use(function (response) {
   document.body.style.cursor = "default";
   var endTime = Date.now();
   var duration = endTime - response.config.startTime;
@@ -12546,13 +12324,13 @@ api.interceptors.response.use(function (response) {
 function updateProgress(progressEvent) {
   progressBar.style.width = "".concat(progressEvent.progress * 100, "%");
   // compute the percentage of the progress
-  // if (progressEvent.lengthComputable) {
-  //   const percentComplete = (progressEvent.loaded / progressEvent.total) * 100;
-  //   progressBar.style.width = `${percentComplete}%`;
-  //   console.log(progressEvent);
-  //   console.log("test");
-  // }
-  console.log(progressEvent.progress);
+  if (progressEvent.lengthComputable) {
+    var percentComplete = progressEvent.loaded / progressEvent.total * 100;
+    progressBar.style.width = "".concat(percentComplete, "%");
+    console.log(progressEvent);
+    console.log("test");
+  }
+  // console.log(progressEvent.progress);
 }
 
 // original function
@@ -12602,6 +12380,8 @@ breedSelect.addEventListener("change", getBreedData);
 function getBreedData(_x) {
   return _getBreedData.apply(this, arguments);
 } // wikipedia_url
+// console.log(favData);
+// add a photo to the group
 function _getBreedData() {
   _getBreedData = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2(e) {
     var breed_id, response, data, breedObj, h1, h2, h3, p;
@@ -12642,7 +12422,7 @@ function _getBreedData() {
           infoDump.appendChild(h1);
           infoDump.appendChild(h2);
           infoDump.appendChild(h3);
-          infoDump.appendChild(p); // add labels for levels
+          infoDump.appendChild(p);
           _context2.next = 29;
           break;
         case 26:
@@ -12659,69 +12439,91 @@ function _getBreedData() {
 }
 function favourite(_x2) {
   return _favourite.apply(this, arguments);
-}
+} //   try {                                    // check if the image is already in the group
+//     const favData = await axios.get("/favourites", {
+//       params: { image_id: imgId },
+//     });
+//     console.log("Response from GET /favourites:", favData);
+//     if (favData.data && favData.data.length > 0) {
+//       console.log(favData.data[0].id);
+//       const favItemId = favData.data[0].id;
+//       if (!favItemId) {
+//         console.error("Error: favItemId is undefined or null.");
+//         return;
+//       }
+//       const deletedFav = await axios.delete(`/favourites/${favItemId}`);
+//       // alert("Image removed from favourites");
+//       console.log(deletedFav.data, "this has been deleted from Favourites");
+//     } else {
+//       // if the image is not in the group, add it
+//       const addedFav = await axios.post("/favourites", {
+//         image_id: imgId,
+//       });
+//       // alert("Image added to Favourites");
+//       console.log("Response from POST /favourites:", addedFav);
+//     }
+//   } catch (error) {
+//     console.error("Error in favourite function:", error);
+//   }
+// }
+// async function getFavorites() {
+//   Carousel.clear();
+//   infoDump.textContent = "";
+//   const favdata = await axios.get("/favourites");
+//   favdata.data.map((image) => {
+//     const url = image.image.url;
+//     const element = Carousel.createCarouselItem(url);
+//     Carousel.appendCarousel(element);
+//   });
+//   Carousel.start();
+// }
+/**
+ * 8. To practice posting data, we'll create a system to "favourite" certain images.
+ * - The skeleton of this function has already been created for you.
+ * - This function is used within Carousel.js to add the event listener as items are created.
+ *  - This is why we use the export keyword for this function.
+ * - Post to the cat API's favourites endpoint with the given ID.
+ * - The API documentation gives examples of this functionality using fetch(); use Axios!
+ * - Add additional logic to this function such that if the image is already favourited,
+ *   you delete that favourite using the API, giving this function "toggle" functionality.
+ * - You can call this function by clicking on the heart at the top right of any image.
+ */
+/**
+ * 9. Test your favourite() function by creating a getFavourites() function.
+ * - Use Axios to get all of your favourites from the cat API.
+ * - Clear the carousel and display your favourites when the button is clicked.
+ *  - You will have to bind this event listener to getFavouritesBtn yourself.
+ *  - Hint: you already have all of the logic built for building a carousel.
+ *    If that isn't in its own function, maybe it should be so you don't have to
+ *    repeat yourself in this section.
+ **/
 function _favourite() {
   _favourite = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3(imgId) {
-    var _favData, favItemId, deletedFav, addedFav;
+    var response, favourites;
     return _regeneratorRuntime().wrap(function _callee3$(_context3) {
       while (1) switch (_context3.prev = _context3.next) {
         case 0:
-          _context3.prev = 0;
-          _context3.next = 3;
-          return _axios.default.get("/favourites", {
-            params: {
-              image_id: imgId
+          _context3.next = 2;
+          return fetch('/favourites?limit=20&sub_id=user-123&order=DESC', {
+            headers: {
+              "content-type": "application/json",
+              'x-api-key': 'YOUR-KEY'
             }
           });
-        case 3:
-          _favData = _context3.sent;
-          console.log("Response from GET /favourites:", _favData);
-          if (!(_favData.data && _favData.data.length > 0)) {
-            _context3.next = 17;
-            break;
-          }
-          console.log(_favData.data[0].id);
-          favItemId = _favData.data[0].id;
-          if (favItemId) {
-            _context3.next = 11;
-            break;
-          }
-          console.error("Error: favItemId is undefined or null.");
-          return _context3.abrupt("return");
-        case 11:
-          _context3.next = 13;
-          return _axios.default.delete("/favourites/".concat(favItemId));
-        case 13:
-          deletedFav = _context3.sent;
-          // alert("Image removed from favourites");
-          console.log(deletedFav.data, "this has been deleted from Favourites");
-          _context3.next = 21;
-          break;
-        case 17:
-          _context3.next = 19;
-          return _axios.default.post("/favourites", {
-            image_id: imgId
-          });
-        case 19:
-          addedFav = _context3.sent;
-          // alert("Image added to Favourites");
-          console.log("Response from POST /favourites:", addedFav);
-        case 21:
-          _context3.next = 26;
-          break;
-        case 23:
-          _context3.prev = 23;
-          _context3.t0 = _context3["catch"](0);
-          console.error("Error in favourite function:", _context3.t0);
-        case 26:
+        case 2:
+          response = _context3.sent;
+          _context3.next = 5;
+          return response.json();
+        case 5:
+          favourites = _context3.sent;
+        case 6:
         case "end":
           return _context3.stop();
       }
-    }, _callee3, null, [[0, 23]]);
+    }, _callee3);
   }));
   return _favourite.apply(this, arguments);
 }
-console.log(favData.data);
 function getFavorites() {
   return _getFavorites.apply(this, arguments);
 }
@@ -12734,7 +12536,7 @@ function _getFavorites() {
           Carousel.clear();
           infoDump.textContent = "";
           _context4.next = 4;
-          return _axios.default.get("/favourites");
+          return _axios.default.get("https://api.thecatapi.com/v1/favourites");
         case 4:
           favdata = _context4.sent;
           favdata.data.map(function (image) {
@@ -12751,7 +12553,7 @@ function _getFavorites() {
   }));
   return _getFavorites.apply(this, arguments);
 }
-getFavouritesBtn.addEventListener("click", getFavorites);
+getFavouritesBtn.addEventListener('click', getFavorites);
 },{"./Carousel.js":"Carousel.js","axios":"node_modules/axios/index.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -12777,7 +12579,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59765" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61960" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
