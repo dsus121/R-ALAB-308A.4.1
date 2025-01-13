@@ -17,6 +17,12 @@ body {
   border-bottom: 1px solid black;
 }
 
+/* #progressBar {
+  height: 100%;  
+  background-color: #4caf50;  
+  width: 0%;  
+} */
+
 .favourite-button {
   position: absolute;
   top: 10px;
@@ -34,6 +40,10 @@ body {
   height: 36px;
   top: 7px;
   right: 12px;
+}
+
+.favourited {
+  color: red; /* Or any style you want to indicate it's favourited */
 }
 
 .carousel-inner {

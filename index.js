@@ -11,7 +11,7 @@ const progressBar = document.getElementById("progressBar");
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
 // Step 0: Store your API key here for reference and easy access.
-const API_KEY = "";
+const API_KEY = "live_JRSGN9YvGuyHRgxfsHMQcnwZaewFzlrcB5PvuWf02JylZ16l5EuRiNuwZgR4rslW";
 
 /**
  * 1. Create an async function "initialLoad" that does the following:
@@ -23,9 +23,9 @@ const API_KEY = "";
  */
 
 async function initialLoad() {
-    const breedList = await fetch("https://api.thecatapi.com/v1/breeds?limit=10&page=0")
+    const breedList = await fetch("https://api.thecatapi.com/v1/breeds")
     const breedData = await breedList.json()
-    console.log(breedData);
+    // console.log(breedData);
     breedData.forEach(breed=>{ // breed select
         const option = document.createElement("option")
         option.textContent = breed.name
@@ -36,6 +36,9 @@ async function initialLoad() {
 
 }
 initialLoad()
+
+
+
 
 
 /**
@@ -54,17 +57,55 @@ initialLoad()
  */
 
 
-// const infoDump = document.getElementById("infoDump");
-getFavouritesBtn.addEventListener("click", getFavorites)
-//     const name = await fetch("https://api.thecatapi.com/v1/breeds?limit=10&page=0")
+breedSelect.addEventListener("change", getBreedData);
 
-// https://api.thecatapi.com/v1/breeds/abys <---
-// function getFavorites()
+async function getBreedData(e) { 
+  Carousel.clear();
+  infoDump.textContent = "";
+  // console.log(breedSelect.value);
+  const breed_id = breedSelect.value;
+  // console.log(e.target);
+  const response = await fetch(
+    `https://api.thecatapi.com/v1/images/search?limit=10&breed_ids=${breed_id}&api_key=${API_KEY}`,
+    {
+      method: "GET",
+      withCredentials: true,
+      headers: {
+        "X-Auth-Token": API_KEY,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  const data = await response.json();
+  // console.log(data, "====2nd===");
+  data.forEach((d) => {
+    const x = Carousel.createCarouselItem(d.url, breed_id, d.id);
+    Carousel.appendCarousel(x);
+  });
+  Carousel.start();
+  // console.log(data[0].breeds[0]);
+  const breedObj = data[0].breeds[0]
+  const h1 = document.createElement('h1')
+  const h2 = document.createElement('h2')
+  const h3 = document.createElement('h3')
 
+  h1.textContent = breedObj.name
+  h2.textContent = breedObj.origin
+  h3.textContent = breedObj.description
+  console.log(breedObj)
+  // description and origin
+  infoDump.appendChild(h1)
+  infoDump.appendChild(h2)
+  infoDump.appendChild(h3)
+
+
+}
 
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
  */
+
+
 /**
  * 4. Change all of your fetch() functions to axios!
  * - axios has already been imported for you within index.js.
