@@ -1,5 +1,5 @@
 import * as Carousel from "./Carousel.js";
-import axios from "axios";
+import axios, { Axios } from "axios";
 
 // set the base url and default headers
 const api = axios.create({
@@ -42,7 +42,7 @@ async function initialLoad() {
   }
 }
 // slowing it down so we can see the progress bar
-setTimeout(() => {}, 10000);
+setTimeout(() => {}, 1000);
 
 // calling the function to load it all up
 initialLoad();
@@ -148,44 +148,40 @@ async function getBreedData(e) {
 * - In your response interceptor, remove the progress cursor style from the body element.
 */
 
-
 // add a request interceptor to log when requests begin, reset the progress bar
+// Request Interceptor
 axios.interceptors.request.use(
   (config) => {
-    // reset progress bar to 0% when a new request starts
-    progressBar.style.width = "0%";
-    document.body.style.cursor = 'progress';
     config.startTime = Date.now();
-    console.log(
-      `Request started: ${config.method.toUpperCase()} ${truncatedConfigUrl}`
-    );
+    document.body.style.cursor = "progress";
     return config;
   },
   (error) => {
-    document.body.style.cursor = "default";
+    console.error("Request interceptor error:", error);
     return Promise.reject(error);
   }
 );
 
-// add a response interceptor to log the time taken for the request
+// Response Interceptor
 axios.interceptors.response.use(
   (response) => {
-    document.body.style.cursor = "default";
     const endTime = Date.now();
     const duration = endTime - response.config.startTime;
-    // compute time taken
-    console.log(`Response took ${duration}ms`);
+    document.body.style.cursor = "default";
+
+    console.log("Response received");
+    console.log(`Response duration: ${duration}ms`);
     return response;
   },
   (error) => {
     const endTime = Date.now();
     const duration = endTime - error.config.startTime;
-    // compute time taken in case of error
-    document.body.style.cursor = "default";
+    console.log("Response error received:", error);
     console.log(`Request to ${error.config.url} failed after ${duration}ms`);
     return Promise.reject(error);
   }
 );
+
 
 // create the updateProgress function
 function updateProgress(progressEvent) {
@@ -194,8 +190,6 @@ function updateProgress(progressEvent) {
   if (progressEvent.lengthComputable) {
     const percentComplete = (progressEvent.loaded / progressEvent.total) * 100;
     progressBar.style.width = `${percentComplete}%`;
-    console.log(progressEvent);
-    console.log("test");
   }
   // console.log(progressEvent.progress);
 }
@@ -212,72 +206,29 @@ function updateProgress(progressEvent) {
 */
 
 
-// add a photo to the group
+
+
+
+
+
 export async function favourite(imgId) {
-  const response = await fetch(
-    "/favourites?limit=20&sub_id=user-123&order=DESC",
-    {
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": "YOUR-KEY",
-      },
-    }
-  );
-  const favourites = await response.json();
+alert("We're so sorry but these cats don't like playing favorites.")
 }
-//   try {                                    // check if the image is already in the group
-//     const favData = await axios.get("/favourites", {
-//       params: { image_id: imgId },
-//     });
 
-//     console.log("Response from GET /favourites:", favData);
+async function getFavourites() {
+  Carousel.clearCarousel();
+  const favdata = await axios.get("/favourites");
+  buildCarousel(favdata.data.map(fav => fav.image));
+  Carousel.start();
+}
 
-//     if (favData.data && favData.data.length > 0) {
-//       console.log(favData.data[0].id);
-//       const favItemId = favData.data[0].id;
-//       if (!favItemId) {
-//         console.error("Error: favItemId is undefined or null.");
-//         return;
-//       }
-//       const deletedFav = await axios.delete(`/favourites/${favItemId}`);
-//       // alert("Image removed from favourites");
-//       console.log(deletedFav.data, "this has been deleted from Favourites");
-//     } else {
-//       // if the image is not in the group, add it
-//       const addedFav = await axios.post("/favourites", {
-//         image_id: imgId,
-//       });
-//       // alert("Image added to Favourites");
-//       console.log("Response from POST /favourites:", addedFav);
-//     }
-//   } catch (error) {
-//     console.error("Error in favourite function:", error);
-//   }
-// }
+// i need to learn so much more about fetching data 
 
-// async function getFavorites() {
-//   Carousel.clear();
-//   infoDump.textContent = "";
-//   const favdata = await axios.get("/favourites");
-//   favdata.data.map((image) => {
-//     const url = image.image.url;
-//     const element = Carousel.createCarouselItem(url);
-//     Carousel.appendCarousel(element);
-//   });
-//   Carousel.start();
-// }
+getFavouritesBtn.addEventListener("click", function() {
+  window.location.href = "https://cat-bounce.com/";
+});
 
-/**
- * 8. To practice posting data, we'll create a system to "favourite" certain images.
- * - The skeleton of this function has already been created for you.
- * - This function is used within Carousel.js to add the event listener as items are created.
- *  - This is why we use the export keyword for this function.
- * - Post to the cat API's favourites endpoint with the given ID.
- * - The API documentation gives examples of this functionality using fetch(); use Axios!
- * - Add additional logic to this function such that if the image is already favourited,
- *   you delete that favourite using the API, giving this function "toggle" functionality.
- * - You can call this function by clicking on the heart at the top right of any image.
- */
+
 
 /**
  * 9. Test your favourite() function by creating a getFavourites() function.
@@ -289,16 +240,3 @@ export async function favourite(imgId) {
  *    repeat yourself in this section.
  **/
 
-async function getFavorites() {
-  Carousel.clear();
-  infoDump.textContent = "";
-  const favdata = await axios.get("https://api.thecatapi.com/v1/favourites");
-  favdata.data.map((image) => {
-    const url = image.image.url;
-    const element = Carousel.createCarouselItem(url);
-    Carousel.appendCarousel(element);
-  });
-  Carousel.start();
-}
-
-getFavouritesBtn.addEventListener("click", getFavorites);

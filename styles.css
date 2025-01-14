@@ -35,7 +35,7 @@ body {
   transition: all ease 0.2s;
 }
 .favourite-button:hover {
-  color: red;
+  color: rgb(255, 140, 0);
   width: 36px;
   height: 36px;
   top: 7px;

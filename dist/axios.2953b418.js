@@ -12248,8 +12248,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.favourite = favourite;
 var Carousel = _interopRequireWildcard(require("./Carousel.js"));
-var _axios = _interopRequireDefault(require("axios"));
-function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+var _axios = _interopRequireWildcard(require("axios"));
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -12315,7 +12314,7 @@ function _initialLoad() {
   }));
   return _initialLoad.apply(this, arguments);
 }
-setTimeout(function () {}, 10000);
+setTimeout(function () {}, 1000);
 
 // calling the function to load it all up
 initialLoad();
@@ -12376,6 +12375,7 @@ function getBreedData(_x) {
 * - In your response interceptor, remove the progress cursor style from the body element.
 */
 // add a request interceptor to log when requests begin, reset the progress bar
+// Request Interceptor
 function _getBreedData() {
   _getBreedData = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2(e) {
     var breed_id, response, data, breedObj, h1, h2, h3, p;
@@ -12432,30 +12432,26 @@ function _getBreedData() {
   return _getBreedData.apply(this, arguments);
 }
 _axios.default.interceptors.request.use(function (config) {
-  // reset progress bar to 0% when a new request starts
-  progressBar.style.width = "0%";
-  document.body.style.cursor = 'progress';
   config.startTime = Date.now();
-  console.log("Request started: ".concat(config.method.toUpperCase(), " ").concat(truncatedConfigUrl));
+  document.body.style.cursor = "progress";
   return config;
 }, function (error) {
-  document.body.style.cursor = "default";
+  console.error("Request interceptor error:", error);
   return Promise.reject(error);
 });
 
-// add a response interceptor to log the time taken for the request
+// Response Interceptor
 _axios.default.interceptors.response.use(function (response) {
-  document.body.style.cursor = "default";
   var endTime = Date.now();
   var duration = endTime - response.config.startTime;
-  // compute time taken
-  console.log("Response took ".concat(duration, "ms"));
+  document.body.style.cursor = "default";
+  console.log("Response received");
+  console.log("Response duration: ".concat(duration, "ms"));
   return response;
 }, function (error) {
   var endTime = Date.now();
   var duration = endTime - error.config.startTime;
-  // compute time taken in case of error
-  document.body.style.cursor = "default";
+  console.log("Response error received:", error);
   console.log("Request to ".concat(error.config.url, " failed after ").concat(duration, "ms"));
   return Promise.reject(error);
 });
@@ -12467,8 +12463,6 @@ function updateProgress(progressEvent) {
   if (progressEvent.lengthComputable) {
     var percentComplete = progressEvent.loaded / progressEvent.total * 100;
     progressBar.style.width = "".concat(percentComplete, "%");
-    console.log(progressEvent);
-    console.log("test");
   }
   // console.log(progressEvent.progress);
 }
@@ -12483,59 +12477,53 @@ function updateProgress(progressEvent) {
 *   you delete that favourite using the API, giving this function "toggle" functionality.
 * - You can call this function by clicking on the heart at the top right of any image.
 */
-
-// add a photo to the group
 function favourite(_x2) {
   return _favourite.apply(this, arguments);
-} //   try {                                    // check if the image is already in the group
-//     const favData = await axios.get("/favourites", {
-//       params: { image_id: imgId },
-//     });
-//     console.log("Response from GET /favourites:", favData);
-//     if (favData.data && favData.data.length > 0) {
-//       console.log(favData.data[0].id);
-//       const favItemId = favData.data[0].id;
-//       if (!favItemId) {
-//         console.error("Error: favItemId is undefined or null.");
-//         return;
-//       }
-//       const deletedFav = await axios.delete(`/favourites/${favItemId}`);
-//       // alert("Image removed from favourites");
-//       console.log(deletedFav.data, "this has been deleted from Favourites");
-//     } else {
-//       // if the image is not in the group, add it
-//       const addedFav = await axios.post("/favourites", {
-//         image_id: imgId,
-//       });
-//       // alert("Image added to Favourites");
-//       console.log("Response from POST /favourites:", addedFav);
-//     }
-//   } catch (error) {
-//     console.error("Error in favourite function:", error);
-//   }
-// }
-// async function getFavorites() {
-//   Carousel.clear();
-//   infoDump.textContent = "";
-//   const favdata = await axios.get("/favourites");
-//   favdata.data.map((image) => {
-//     const url = image.image.url;
-//     const element = Carousel.createCarouselItem(url);
-//     Carousel.appendCarousel(element);
-//   });
-//   Carousel.start();
-// }
-/**
- * 8. To practice posting data, we'll create a system to "favourite" certain images.
- * - The skeleton of this function has already been created for you.
- * - This function is used within Carousel.js to add the event listener as items are created.
- *  - This is why we use the export keyword for this function.
- * - Post to the cat API's favourites endpoint with the given ID.
- * - The API documentation gives examples of this functionality using fetch(); use Axios!
- * - Add additional logic to this function such that if the image is already favourited,
- *   you delete that favourite using the API, giving this function "toggle" functionality.
- * - You can call this function by clicking on the heart at the top right of any image.
- */
+}
+function _favourite() {
+  _favourite = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3(imgId) {
+    return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+      while (1) switch (_context3.prev = _context3.next) {
+        case 0:
+          alert("We're so sorry but these cats don't like playing favorites.");
+        case 1:
+        case "end":
+          return _context3.stop();
+      }
+    }, _callee3);
+  }));
+  return _favourite.apply(this, arguments);
+}
+function getFavourites() {
+  return _getFavourites.apply(this, arguments);
+} // i need to learn so much more about fetching data 
+function _getFavourites() {
+  _getFavourites = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+    var favdata;
+    return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+      while (1) switch (_context4.prev = _context4.next) {
+        case 0:
+          Carousel.clearCarousel();
+          _context4.next = 3;
+          return _axios.default.get("/favourites");
+        case 3:
+          favdata = _context4.sent;
+          buildCarousel(favdata.data.map(function (fav) {
+            return fav.image;
+          }));
+          Carousel.start();
+        case 6:
+        case "end":
+          return _context4.stop();
+      }
+    }, _callee4);
+  }));
+  return _getFavourites.apply(this, arguments);
+}
+getFavouritesBtn.addEventListener("click", function () {
+  window.location.href = "https://cat-bounce.com/";
+});
+
 /**
  * 9. Test your favourite() function by creating a getFavourites() function.
  * - Use Axios to get all of your favourites from the cat API.
@@ -12545,63 +12533,6 @@ function favourite(_x2) {
  *    If that isn't in its own function, maybe it should be so you don't have to
  *    repeat yourself in this section.
  **/
-function _favourite() {
-  _favourite = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3(imgId) {
-    var response, favourites;
-    return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-      while (1) switch (_context3.prev = _context3.next) {
-        case 0:
-          _context3.next = 2;
-          return fetch("/favourites?limit=20&sub_id=user-123&order=DESC", {
-            headers: {
-              "content-type": "application/json",
-              "x-api-key": "YOUR-KEY"
-            }
-          });
-        case 2:
-          response = _context3.sent;
-          _context3.next = 5;
-          return response.json();
-        case 5:
-          favourites = _context3.sent;
-        case 6:
-        case "end":
-          return _context3.stop();
-      }
-    }, _callee3);
-  }));
-  return _favourite.apply(this, arguments);
-}
-function getFavorites() {
-  return _getFavorites.apply(this, arguments);
-}
-function _getFavorites() {
-  _getFavorites = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-    var favdata;
-    return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-      while (1) switch (_context4.prev = _context4.next) {
-        case 0:
-          Carousel.clear();
-          infoDump.textContent = "";
-          _context4.next = 4;
-          return _axios.default.get("https://api.thecatapi.com/v1/favourites");
-        case 4:
-          favdata = _context4.sent;
-          favdata.data.map(function (image) {
-            var url = image.image.url;
-            var element = Carousel.createCarouselItem(url);
-            Carousel.appendCarousel(element);
-          });
-          Carousel.start();
-        case 7:
-        case "end":
-          return _context4.stop();
-      }
-    }, _callee4);
-  }));
-  return _getFavorites.apply(this, arguments);
-}
-getFavouritesBtn.addEventListener("click", getFavorites);
 },{"./Carousel.js":"Carousel.js","axios":"node_modules/axios/index.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -12627,7 +12558,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61960" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59112" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
