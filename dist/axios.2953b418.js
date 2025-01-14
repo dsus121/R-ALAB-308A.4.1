@@ -12277,62 +12277,6 @@ var getFavouritesBtn = document.getElementById("getFavouritesBtn");
 // Step 0: Store your API key here for reference and easy access.
 var API_KEY = "live_JRSGN9YvGuyHRgxfsHMQcnwZaewFzlrcB5PvuWf02JylZ16l5EuRiNuwZgR4rslW";
 
-// add start time to the request object
-//     const truncatedConfigUrl =
-//       config.url.length > 10 ? config.url.substring(0, 10) + "..." : config.url;
-//     console.log(`Request started: ${config.method.toUpperCase()} ${truncatedConfigUrl}`
-//     );
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//     error;
-//   }
-// );
-
-// add a request interceptor to log when requests begin, reset the progress bar
-_axios.default.interceptors.request.use(function (config) {
-  // reset progress bar to 0% when a new request starts
-  progressBar.style.width = "0%";
-  document.body.style.cursor = "progress";
-  config.startTime = Date.now();
-  console.log("Request started: ".concat(config.method.toUpperCase(), " ").concat(truncatedConfigUrl));
-  return config;
-}, function (error) {
-  document.body.style.cursor = "default";
-  return Promise.reject(error);
-});
-
-// add a response interceptor to log the time taken for the request
-_axios.default.interceptors.response.use(function (response) {
-  document.body.style.cursor = "default";
-  var endTime = Date.now();
-  var duration = endTime - response.config.startTime;
-  // compute time taken
-  console.log("Response took ".concat(duration, "ms"));
-  return response;
-}, function (error) {
-  var endTime = Date.now();
-  var duration = endTime - error.config.startTime;
-  // compute time taken in case of error
-  document.body.style.cursor = "default";
-  console.log("Request to ".concat(error.config.url, " failed after ").concat(duration, "ms"));
-  return Promise.reject(error);
-});
-
-// create the updateProgress function
-function updateProgress(progressEvent) {
-  progressBar.style.width = "".concat(progressEvent.progress * 100, "%");
-  // compute the percentage of the progress
-  if (progressEvent.lengthComputable) {
-    var percentComplete = progressEvent.loaded / progressEvent.total * 100;
-    progressBar.style.width = "".concat(percentComplete, "%");
-    console.log(progressEvent);
-    console.log("test");
-  }
-  // console.log(progressEvent.progress);
-}
-
 // original function
 function initialLoad() {
   return _initialLoad.apply(this, arguments);
@@ -12371,17 +12315,67 @@ function _initialLoad() {
   }));
   return _initialLoad.apply(this, arguments);
 }
-setTimeout(function () {}, 9000);
+setTimeout(function () {}, 10000);
 
 // calling the function to load it all up
 initialLoad();
+
+/**
+ * 2. Create an event handler for breedSelect that does the following:
+ * - Retrieve information on the selected breed from the cat API using fetch().
+ *  - Make sure your request is receiving multiple array items!
+ *  - Check the API documentation if you're only getting a single object.
+ * - For each object in the response array, create a new element for the carousel.
+ *  - Append each of these new elements to the carousel.
+ * - Use the other data you have been given to create an informational section within the infoDump element.
+ *  - Be creative with how you create DOM elements and HTML.
+ *  - Feel free to edit index.html and styles.css to suit your needs, but be careful!
+ *  - Remember that functionality comes first, but user experience and design are important.
+ * - Each new selection should clear, re-populate, and restart the Carousel.
+ * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
+ */
+
 // when the dropdown is selected ...
 breedSelect.addEventListener("change", getBreedData);
 function getBreedData(_x) {
   return _getBreedData.apply(this, arguments);
 } // wikipedia_url
 // console.log(favData);
-// add a photo to the group
+// * 3. 4. Change all of your fetch() functions to axios!
+// * - axios has already been imported for you within index.js.
+// * - If you've done everything correctly up to this point, this should be simple.
+// * - If it is not simple, take a moment to re-evaluate your original code.
+// * - Hint: Axios has the ability to set default headers. Use this to your advantage
+// *   by setting a default header with your API key so that you do not have to
+// *   send it manually with all of your requests! You can also set a default base URL!
+// */
+/**
+* 5. Add axios interceptors to log the time between request and response to the console.
+* - Hint: you already have access to code that does this!
+* - Add a console.log statement to indicate when requests begin.
+* - As an added challenge, try to do this on your own without referencing the lesson material.
+*/
+/**
+* 6. Next, we'll create a progress bar to indicate the request is in progress.
+* - The progressBar element has already been created for you.
+*  - You need only to modify its "width" style property to align with the request progress.
+* - In your request interceptor, set the width of the progressBar element to 0%.
+*  - This is to reset the progress with each request.
+* - Research the axios onDownloadProgress config option.
+* - Create a function "updateProgress" that receives a ProgressEvent object.
+*  - Pass this function to the axios onDownloadProgress config option in your event handler.
+* - console.log your ProgressEvent object within updateProgess, and familiarize yourself with its structure.
+*  - Update the progress of the request using the properties you are given.
+* - Note that we are not downloading a lot of data, so onDownloadProgress will likely only fire
+*   once or twice per request to this API. This is still a concept worth familiarizing yourself
+*   with for future projects.
+*/
+/**
+* 7. As a final element of progress indication, add the following to your axios interceptors:
+* - In your request interceptor, set the body element's cursor style to "progress."
+* - In your response interceptor, remove the progress cursor style from the body element.
+*/
+// add a request interceptor to log when requests begin, reset the progress bar
 function _getBreedData() {
   _getBreedData = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2(e) {
     var breed_id, response, data, breedObj, h1, h2, h3, p;
@@ -12407,7 +12401,7 @@ function _getBreedData() {
             Carousel.appendCarousel(x);
           });
           Carousel.start();
-          breedObj = data[0].breeds[0];
+          breedObj = data[0].breeds[0]; // adding elements to infoDump
           h1 = document.createElement("h1");
           h2 = document.createElement("h2");
           h3 = document.createElement("h3");
@@ -12417,26 +12411,80 @@ function _getBreedData() {
           h3.textContent = "(".concat(breedObj.alt_names, ") \u2014 ").concat(breedObj.description, " Life expectancy is ").concat(breedObj.life_span, " years.");
           p.textContent = "Energy Level is: ".concat(breedObj.energy_level, " | Affection Level is: ").concat(breedObj.affection_level, " | Temperament \u2014 ").concat(breedObj.temperament);
           //
-          console.log(breedObj);
+          // console.log(breedObj);
           // description and origin
           infoDump.appendChild(h1);
           infoDump.appendChild(h2);
           infoDump.appendChild(h3);
           infoDump.appendChild(p);
-          _context2.next = 29;
+          _context2.next = 28;
           break;
-        case 26:
-          _context2.prev = 26;
+        case 25:
+          _context2.prev = 25;
           _context2.t0 = _context2["catch"](3);
           console.error("Error ... can't grab that breed data:", _context2.t0);
-        case 29:
+        case 28:
         case "end":
           return _context2.stop();
       }
-    }, _callee2, null, [[3, 26]]);
+    }, _callee2, null, [[3, 25]]);
   }));
   return _getBreedData.apply(this, arguments);
 }
+_axios.default.interceptors.request.use(function (config) {
+  // reset progress bar to 0% when a new request starts
+  progressBar.style.width = "0%";
+  document.body.style.cursor = 'progress';
+  config.startTime = Date.now();
+  console.log("Request started: ".concat(config.method.toUpperCase(), " ").concat(truncatedConfigUrl));
+  return config;
+}, function (error) {
+  document.body.style.cursor = "default";
+  return Promise.reject(error);
+});
+
+// add a response interceptor to log the time taken for the request
+_axios.default.interceptors.response.use(function (response) {
+  document.body.style.cursor = "default";
+  var endTime = Date.now();
+  var duration = endTime - response.config.startTime;
+  // compute time taken
+  console.log("Response took ".concat(duration, "ms"));
+  return response;
+}, function (error) {
+  var endTime = Date.now();
+  var duration = endTime - error.config.startTime;
+  // compute time taken in case of error
+  document.body.style.cursor = "default";
+  console.log("Request to ".concat(error.config.url, " failed after ").concat(duration, "ms"));
+  return Promise.reject(error);
+});
+
+// create the updateProgress function
+function updateProgress(progressEvent) {
+  progressBar.style.width = "".concat(progressEvent.progress * 100, "%");
+  // compute the percentage of the progress
+  if (progressEvent.lengthComputable) {
+    var percentComplete = progressEvent.loaded / progressEvent.total * 100;
+    progressBar.style.width = "".concat(percentComplete, "%");
+    console.log(progressEvent);
+    console.log("test");
+  }
+  // console.log(progressEvent.progress);
+}
+/**
+* 8. To practice posting data, we'll create a system to "favourite" certain images.
+* - The skeleton of this function has already been created for you.
+* - This function is used within Carousel.js to add the event listener as items are created.
+*  - This is why we use the export keyword for this function.
+* - Post to the cat API's favourites endpoint with the given ID.
+* - The API documentation gives examples of this functionality using fetch(); use Axios!
+* - Add additional logic to this function such that if the image is already favourited,
+*   you delete that favourite using the API, giving this function "toggle" functionality.
+* - You can call this function by clicking on the heart at the top right of any image.
+*/
+
+// add a photo to the group
 function favourite(_x2) {
   return _favourite.apply(this, arguments);
 } //   try {                                    // check if the image is already in the group
@@ -12504,10 +12552,10 @@ function _favourite() {
       while (1) switch (_context3.prev = _context3.next) {
         case 0:
           _context3.next = 2;
-          return fetch('/favourites?limit=20&sub_id=user-123&order=DESC', {
+          return fetch("/favourites?limit=20&sub_id=user-123&order=DESC", {
             headers: {
               "content-type": "application/json",
-              'x-api-key': 'YOUR-KEY'
+              "x-api-key": "YOUR-KEY"
             }
           });
         case 2:
@@ -12553,7 +12601,7 @@ function _getFavorites() {
   }));
   return _getFavorites.apply(this, arguments);
 }
-getFavouritesBtn.addEventListener('click', getFavorites);
+getFavouritesBtn.addEventListener("click", getFavorites);
 },{"./Carousel.js":"Carousel.js","axios":"node_modules/axios/index.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
